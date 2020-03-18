@@ -1,15 +1,39 @@
 <template>
     <div class="login_container">
         <div class="login_box">
+            <!-- 头像区域 -->
             <div class="avatar_box">
                 <img src="../assets/logo.png" alt="">
             </div>
+
+            <!-- 登录表单 -->
+            <el-form label-width="0px" class="login_form" ref="loginFormRef" :model="loginForm">
+                <el-form-item>
+                    <el-input placeholder="Username" prefix-icon="el-icon-user" v-model="loginForm.username"></el-input>
+                </el-form-item>
+                <el-form-item>
+                    <el-input placeholder="Password" prefix-icon="el-icon-lock" v-model="loginForm.password"></el-input>
+                </el-form-item>
+                <el-form-item class="btns">
+                    <el-button type="primary">登录</el-button>
+                    <el-button type="info">重置</el-button>
+                </el-form-item>
+            </el-form>
         </div>
     </div>
 </template>
 
 <script>
-export default {}
+export default {
+  data () {
+    return {
+      loginForm: {
+        username: '',
+        password: ''
+      }
+    }
+  }
+}
 </script>
 
 <style lang="less" scoped>
@@ -46,5 +70,18 @@ export default {}
                 background-color: #eee;
             }
         }
+    }
+
+    .btns{
+        display: flex;
+        justify-content: flex-end;
+    }
+
+    .login_form{
+        position: absolute;
+        bottom: 0;
+        width: 100%;
+        padding: 0 10px;
+        box-sizing: border-box;
     }
 </style>
