@@ -31,7 +31,6 @@ export default new Router({
         { path: '/cicd/deploy', component: Deploy },
         { path: '/cicd/rollback', component: Rollback }
       ]
-
     },
     {
       path: '/login',
