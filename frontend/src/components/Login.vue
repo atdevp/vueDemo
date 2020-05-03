@@ -7,16 +7,20 @@
             </div>
 
             <!-- 登录表单 -->
-            <el-form label-width="0px" class="login_form" ref="loginFormRef" :model="loginForm">
-                <el-form-item>
-                    <el-input placeholder="Username" prefix-icon="el-icon-user" v-model="loginForm.username"></el-input>
+            <!-- :model 代表数据绑定 v-model 绑定具体属性 -->
+            <!-- :rules 表单验证规则 prop 绑定具体input -->
+            <!-- ref  定义实例对象 -->
+            <el-form label-width="0px" class="login_form" ref="loginFormRef" :model="loginForm" :rules="ruleLoginForm">
+                <el-form-item prop="email">
+                    <el-input placeholder="Email" prefix-icon="el-icon-user" v-model="loginForm.email"></el-input>
                 </el-form-item>
-                <el-form-item>
-                    <el-input placeholder="Password" prefix-icon="el-icon-lock" v-model="loginForm.password"></el-input>
+                <el-form-item prop="password">
+                    <el-input placeholder="Password" prefix-icon="el-icon-lock" v-model="loginForm.password" type="password"></el-input>
                 </el-form-item>
                 <el-form-item class="btns">
-                    <el-button type="primary">登录</el-button>
-                    <el-button type="info">重置</el-button>
+                    <!-- 登录前进行表单预验证 -->
+                    <el-button type="primary" @click="login">登录</el-button>
+                    <el-button type="info" @click="resetLoginForm">重置</el-button>
                 </el-form-item>
             </el-form>
         </div>
@@ -27,10 +31,52 @@
 export default {
   data () {
     return {
+      // 登录表单绑定对象
       loginForm: {
-        username: '',
+        email: '',
         password: ''
+      },
+      //   表单验证规则对象
+      ruleLoginForm: {
+        email: [
+          { required: true, message: '请输入登录邮箱', trigger: 'blur' }
+        ],
+        password: [
+          { required: true, message: '请输入登录密码', trigger: 'blur' }
+        ]
       }
+    }
+  },
+  methods: {
+    //   重置
+    resetLoginForm () {
+      this.$refs.loginFormRef.resetFields()
+    },
+    login () {
+      this.$refs.loginFormRef.validate(async valid => {
+        if (!valid) return
+        // 结构赋值获取data对象
+        const { data: res } = await this.$http.post('/users/login.go', this.loginForm)
+        if (res.code !== 200) {
+          // 登录弹出框
+          this.$message({
+            message: '登录失败',
+            type: 'error'
+          })
+        }
+        this.$message({
+          message: '恭喜你，登录成功',
+          type: 'success'
+        })
+
+        // 1. 登录成功后token保存到客户端的sessionStorage中
+        // 1.1  项目中出现了登录职位的其他API接口，必须登录之后才能访问
+        // 1.2  token保存在sessionStorage中
+        // 2. 通过编程式导航跳转到后台主页
+
+        window.sessionStorage.setItem('token', 'token ' + res.data.access_token)
+        this.$router.push('/home')
+      })
     }
   }
 }

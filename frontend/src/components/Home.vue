@@ -27,99 +27,22 @@
           router
         >
           <!-- 一级菜单模板区 -->
-          <el-submenu index="1">
+
+          <el-submenu :index="item.id + ''" v-for="item in menulist" :key="item.id">
+
             <template slot="title">
-              <i class="el-icon-user"></i>
-              <span>用户管理</span>
+              <i :class=item.icon></i>
+              <span>{{item.show_name}}</span>
             </template>
 
             <!-- 二级菜单 -->
-            <el-menu-item index="users">
+            <el-menu-item :index="sub.url" v-for="sub in item.children" :key="sub.id">
               <template slot="title">
-                <i class="el-icon-menu"></i>
-                <span>用户列表</span>
-              </template>
-            </el-menu-item>
-          </el-submenu>
-
-          <!-- 一级菜单模板区 -->
-          <el-submenu index="2">
-            <template slot="title">
-              <i class="el-icon-folder"></i>
-              <span>项目管理</span>
-            </template>
-
-            <!-- 二级菜单 -->
-            <el-menu-item index="2-1">
-              <template slot="title">
-                <i class="el-icon-menu"></i>
-                <span>项目列表</span>
+                <i :class=sub.icon></i>
+                <span>{{sub.show_name}}</span>
               </template>
             </el-menu-item>
 
-            <el-menu-item index="2-2">
-              <template slot="title">
-                <i class="el-icon-menu"></i>
-                <span>项目添加</span>
-              </template>
-            </el-menu-item>
-          </el-submenu>
-
-          <!-- 一级菜单模板区 -->
-          <el-submenu index="3">
-            <template slot="title">
-              <i class="el-icon-folder-opened"></i>
-              <span>应用管理</span>
-            </template>
-
-            <!-- 二级菜单 -->
-            <el-menu-item index="3-1">
-              <template slot="title">
-                <i class="el-icon-menu"></i>
-                <span>应用列表</span>
-              </template>
-            </el-menu-item>
-
-            <el-menu-item index="3-2">
-              <template slot="title">
-                <i class="el-icon-menu"></i>
-                <span>应用添加</span>
-              </template>
-            </el-menu-item>
-
-            <el-menu-item index="3-3">
-              <template slot="title">
-                <i class="el-icon-menu"></i>
-                <span>应用管理</span>
-              </template>
-            </el-menu-item>
-          </el-submenu>
-
-          <!-- 一级菜单区域 -->
-          <el-submenu index="4">
-            <template slot="title">
-              <i class="el-icon-s-tools"></i>
-              <span>持续集成</span>
-            </template>
-
-            <el-menu-item index="4-1">
-              <template slot="title">
-                <i class="el-icon-menu"></i>
-                <span>编译</span>
-              </template>
-            </el-menu-item>
-            <el-menu-item index="4-2">
-              <template slot="title">
-                <i class="el-icon-menu"></i>
-                <span>发布</span>
-              </template>
-            </el-menu-item>
-            <el-menu-item index="4-3">
-              <template slot="title">
-                <i class="el-icon-menu"></i>
-                <span>回滚</span>
-              </template>
-            </el-menu-item>
           </el-submenu>
         </el-menu>
       </el-aside>
@@ -138,14 +61,34 @@ export default {
   data () {
     return {
       // 是否默认折叠左侧菜单
-      isCollapse: false
+      isCollapse: false,
+      menulist: []
     }
   },
   methods: {
     // 左侧菜单折叠与展开
     toggleCollapse () {
       this.isCollapse = !this.isCollapse
+    },
+    logout () {
+      // 清空token
+      window.sessionStorage.clear()
+      // 跳转login
+      this.$router.push('/login')
+    },
+    async getMenuList () {
+      const { data: res } = await this.$http.get('/menu/list.go')
+      if (res.code !== 200) {
+        return this.$message({
+          'message': '获取菜单失败',
+          'type': 'error'
+        })
+      }
+      this.menulist = res.data
     }
+  },
+  created () {
+    this.getMenuList()
   }
 }
 </script>
